@@ -29,12 +29,30 @@ const categoryOptions = [
   { value: 'isolation', label: 'Isolation (Curls, Lateral Raises…)' },
 ];
 
+type NumericKey = 'repRangeMin' | 'repRangeMax' | 'startingSets' | 'startingWeight';
+
+function makeDisplays(data: ExerciseFormData) {
+  return {
+    repRangeMin: String(data.repRangeMin),
+    repRangeMax: String(data.repRangeMax),
+    startingSets: String(data.startingSets),
+    startingWeight: String(data.startingWeight),
+  };
+}
+
 export function ExerciseForm({ open, onClose, onSubmit, initialData, title = 'Add Exercise' }: ExerciseFormProps) {
   const [form, setForm] = useState<ExerciseFormData>(initialData ?? defaultData);
   const [errors, setErrors] = useState<Partial<Record<keyof ExerciseFormData, string>>>({});
+  const [displays, setDisplays] = useState(() => makeDisplays(initialData ?? defaultData));
 
   const set = <K extends keyof ExerciseFormData>(key: K, value: ExerciseFormData[K]) =>
     setForm((f) => ({ ...f, [key]: value }));
+
+  const setNumeric = (key: NumericKey, raw: string) => {
+    setDisplays((d) => ({ ...d, [key]: raw }));
+    const n = key === 'startingWeight' ? parseFloat(raw) : parseInt(raw);
+    if (!isNaN(n)) set(key, n as never);
+  };
 
   const validate = () => {
     const e: typeof errors = {};
@@ -49,13 +67,17 @@ export function ExerciseForm({ open, onClose, onSubmit, initialData, title = 'Ad
   const handleSubmit = () => {
     if (!validate()) return;
     onSubmit(form);
-    setForm(initialData ?? defaultData);
+    const reset = initialData ?? defaultData;
+    setForm(reset);
+    setDisplays(makeDisplays(reset));
     setErrors({});
     onClose();
   };
 
   const handleClose = () => {
-    setForm(initialData ?? defaultData);
+    const reset = initialData ?? defaultData;
+    setForm(reset);
+    setDisplays(makeDisplays(reset));
     setErrors({});
     onClose();
   };
@@ -92,19 +114,17 @@ export function ExerciseForm({ open, onClose, onSubmit, initialData, title = 'Ad
         <div className="grid grid-cols-2 gap-3">
           <Input
             label="Rep Range Min"
-            type="number"
-            min={1}
-            max={50}
-            value={form.repRangeMin}
-            onChange={(e) => set('repRangeMin', parseInt(e.target.value) || 1)}
+            type="text"
+            inputMode="numeric"
+            value={displays.repRangeMin}
+            onChange={(e) => setNumeric('repRangeMin', e.target.value)}
           />
           <Input
             label="Rep Range Max"
-            type="number"
-            min={1}
-            max={50}
-            value={form.repRangeMax}
-            onChange={(e) => set('repRangeMax', parseInt(e.target.value) || 1)}
+            type="text"
+            inputMode="numeric"
+            value={displays.repRangeMax}
+            onChange={(e) => setNumeric('repRangeMax', e.target.value)}
             error={errors.repRangeMax}
           />
         </div>
@@ -112,21 +132,19 @@ export function ExerciseForm({ open, onClose, onSubmit, initialData, title = 'Ad
         <div className="grid grid-cols-2 gap-3">
           <Input
             label="Starting Sets (MEV)"
-            type="number"
-            min={1}
-            max={10}
-            value={form.startingSets}
-            onChange={(e) => set('startingSets', parseInt(e.target.value) || 1)}
+            type="text"
+            inputMode="numeric"
+            value={displays.startingSets}
+            onChange={(e) => setNumeric('startingSets', e.target.value)}
             error={errors.startingSets}
             hint="Minimum effective volume"
           />
           <Input
             label="Starting Weight (kg)"
-            type="number"
-            min={0.5}
-            step={2.5}
-            value={form.startingWeight}
-            onChange={(e) => set('startingWeight', parseFloat(e.target.value) || 0)}
+            type="text"
+            inputMode="decimal"
+            value={displays.startingWeight}
+            onChange={(e) => setNumeric('startingWeight', e.target.value)}
             error={errors.startingWeight}
           />
         </div>
