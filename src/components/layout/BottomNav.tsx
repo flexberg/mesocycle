@@ -47,7 +47,7 @@ const items: { page: Page; label: string; icon: React.ReactNode }[] = [
 
 export function BottomNav({ activePage, onNavigate }: BottomNavProps) {
   return (
-    <nav className="md:hidden fixed bottom-0 inset-x-0 bg-surface-900 border-t border-surface-700 flex z-40">
+    <nav className="md:hidden fixed bottom-0 inset-x-0 bg-surface-900 border-t border-amber-500/20 flex z-40">
       {items.map(({ page, label, icon }) => {
         const active = activePage === page;
         return (
@@ -57,7 +57,7 @@ export function BottomNav({ activePage, onNavigate }: BottomNavProps) {
             className={`
               flex-1 flex flex-col items-center justify-center py-2.5 gap-0.5 text-xs font-medium
               transition-colors cursor-pointer
-              ${active ? 'text-blue-400' : 'text-gray-500 hover:text-gray-300'}
+              ${active ? 'text-amber-400' : 'text-gray-600 hover:text-gray-400'}
             `}
           >
             {icon}

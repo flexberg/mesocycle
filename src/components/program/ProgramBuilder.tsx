@@ -150,7 +150,7 @@ export function ProgramBuilder() {
       <div className="flex items-center gap-2">
         {editNameId === program.id ? (
           <input
-            className="flex-1 bg-transparent text-xl font-bold text-gray-100 border-b border-blue-500 focus:outline-none"
+            className="flex-1 bg-transparent text-xl font-bold text-gray-100 border-b border-amber-500 focus:outline-none"
             value={editNameVal}
             onChange={(e) => setEditNameVal(e.target.value)}
             onBlur={() => {
@@ -169,7 +169,7 @@ export function ProgramBuilder() {
         ) : (
           <button
             onClick={() => { setEditNameId(program.id); setEditNameVal(program.name); }}
-            className="flex-1 text-left text-xl font-bold text-gray-100 hover:text-blue-400 transition-colors cursor-pointer"
+            className="flex-1 text-left text-xl font-bold text-gray-100 hover:text-amber-400 transition-colors cursor-pointer"
           >
             {program.name}
           </button>
@@ -229,7 +229,7 @@ export function ProgramBuilder() {
               onClick={() => setMesoCount(n)}
               className={`px-3 py-1 rounded-md text-sm font-medium border transition-colors cursor-pointer ${
                 mesoCount === n
-                  ? 'bg-blue-600/20 text-blue-400 border-blue-600/40'
+                  ? 'bg-amber-500/15 text-amber-400 border-amber-500/40'
                   : 'text-gray-500 border-surface-600 hover:border-surface-500'
               }`}
             >

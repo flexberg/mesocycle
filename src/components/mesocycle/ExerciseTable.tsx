@@ -9,14 +9,14 @@ interface ExerciseTableProps {
 function cellBg(weekNum: number): string {
   if (weekNum === 5) return 'bg-blue-900/30 text-blue-300';
   if (weekNum === 4) return 'bg-red-900/30 text-red-300';
-  if (weekNum === 3) return 'bg-amber-900/30 text-amber-300';
+  if (weekNum === 3) return 'bg-orange-900/30 text-orange-300';
   return 'bg-green-900/30 text-green-300';
 }
 
 function weekHeaderBg(weekNum: number): string {
   if (weekNum === 5) return 'text-blue-400';
   if (weekNum === 4) return 'text-red-400';
-  if (weekNum === 3) return 'text-amber-400';
+  if (weekNum === 3) return 'text-orange-400';
   return 'text-green-400';
 }
 
@@ -52,13 +52,13 @@ export function ExerciseTable({ plan, frequency }: ExerciseTableProps) {
   const isPrimary = plan.category === 'primary_compound';
 
   return (
-    <div className="bg-surface-800 border border-surface-700 rounded-xl overflow-hidden">
+    <div className="bg-surface-800 border border-surface-600 rounded overflow-hidden">
       {/* Exercise header */}
       <div className="flex items-center gap-2 px-4 py-2.5 border-b border-surface-700">
         <span className="font-medium text-gray-100 text-sm">{plan.exerciseName}</span>
         <CategoryBadge category={plan.category} />
         {frequency === 2 && (
-          <span className="ml-auto text-xs text-violet-400 font-medium">2×/week — sets shown weekly</span>
+          <span className="ml-auto text-xs text-amber-400/70 font-bold uppercase tracking-widest">2×/week</span>
         )}
       </div>
 

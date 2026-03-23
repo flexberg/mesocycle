@@ -45,10 +45,10 @@ export function Sidebar({ activePage, onNavigate }: SidebarProps) {
     <aside className="hidden md:flex flex-col w-56 min-h-screen bg-surface-900 border-r border-surface-700 py-6 px-3 gap-1">
       {/* Brand */}
       <div className="px-3 mb-6">
-        <span className="text-xl font-bold bg-gradient-to-r from-blue-400 to-violet-400 bg-clip-text text-transparent">
-          MesoCycle
+        <span className="text-xl font-black tracking-tight text-amber-400 uppercase">
+          Mesocycle
         </span>
-        <p className="text-xs text-gray-600 mt-0.5">Periodization Planner</p>
+        <p className="text-xs text-gray-600 mt-0.5 uppercase tracking-widest">Iron Planner</p>
       </div>
 
       {navItems.map(({ page, label, icon }) => {
@@ -58,15 +58,15 @@ export function Sidebar({ activePage, onNavigate }: SidebarProps) {
             key={page}
             onClick={() => onNavigate(page)}
             className={`
-              flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium w-full text-left
+              flex items-center gap-3 px-3 py-2.5 rounded text-xs font-bold uppercase tracking-widest w-full text-left
               transition-colors duration-150 cursor-pointer
               ${active
-                ? 'bg-blue-600/20 text-blue-400 border border-blue-600/30'
-                : 'text-gray-400 hover:text-gray-100 hover:bg-surface-700 border border-transparent'
+                ? 'bg-amber-500/10 text-amber-400 border border-amber-500/30'
+                : 'text-gray-500 hover:text-gray-100 hover:bg-surface-700 border border-transparent'
               }
             `}
           >
-            <span className={active ? 'text-blue-400' : 'text-gray-500'}>{icon}</span>
+            <span className={active ? 'text-amber-400' : 'text-gray-600'}>{icon}</span>
             {label}
           </button>
         );

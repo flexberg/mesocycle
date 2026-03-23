@@ -43,12 +43,12 @@ export default function App() {
       {/* Main content */}
       <div className="flex-1 flex flex-col min-h-screen">
         {/* Top bar */}
-        <header className="flex items-center justify-between px-4 py-3 border-b border-surface-800 bg-surface-900 no-print sticky top-0 z-30">
+        <header className="flex items-center justify-between px-4 py-3 border-b border-surface-700 bg-surface-900 no-print sticky top-0 z-30">
           <div className="flex items-center gap-3">
-            <span className="md:hidden text-base font-bold bg-gradient-to-r from-blue-400 to-violet-400 bg-clip-text text-transparent">
-              MesoCycle
+            <span className="md:hidden text-base font-black tracking-tight text-amber-400 uppercase">
+              Mesocycle
             </span>
-            <h1 className="text-sm font-semibold text-gray-300">{pageTitles[page]}</h1>
+            <h1 className="text-xs font-bold text-gray-500 uppercase tracking-widest">{pageTitles[page]}</h1>
           </div>
 
           <div className="flex items-center gap-2">

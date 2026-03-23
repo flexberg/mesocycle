@@ -12,15 +12,15 @@ import type {
   SetSpec,
 } from '../../types';
 
-// ─── RIR Deviation Indicator ──────────────────────────────────────────────────
+// ─── RIR Deviation ────────────────────────────────────────────────────────────
 
 function RIRIndicator({ prescribed, actual }: { prescribed: number; actual: number }) {
   const diff = actual - prescribed;
   if (Math.abs(diff) <= 1)
-    return <span className="text-green-400 text-xs font-medium">On target</span>;
+    return <span className="text-green-400 text-xs font-bold uppercase tracking-wide">On target</span>;
   if (diff > 1)
-    return <span className="text-amber-400 text-xs font-medium">Too easy</span>;
-  return <span className="text-red-400 text-xs font-medium">Too hard</span>;
+    return <span className="text-amber-400 text-xs font-bold uppercase tracking-wide">Too easy</span>;
+  return <span className="text-red-400 text-xs font-bold uppercase tracking-wide">Too hard</span>;
 }
 
 // ─── Set Row ──────────────────────────────────────────────────────────────────
@@ -30,63 +30,109 @@ interface SetRowProps {
   prescribed: SetSpec;
   value: LoggedSet;
   onChange: (v: LoggedSet) => void;
+  onClear: () => void;
 }
 
-function SetRow({ setNum, prescribed, value, onChange }: SetRowProps) {
-  const update = (field: keyof LoggedSet, val: number) =>
-    onChange({ ...value, [field]: val });
+const REP_OPTIONS = Array.from({ length: 30 }, (_, i) => i + 1);
+
+function SetRow({ setNum, prescribed, value, onChange, onClear }: SetRowProps) {
+  const [weightStr, setWeightStr] = useState(
+    value.weight > 0 ? String(value.weight) : ''
+  );
+
+  const updateReps = (reps: number) => onChange({ ...value, reps });
+  const updateRir = (rir: number) => onChange({ ...value, rir });
+
+  const handleWeightChange = (raw: string) => {
+    setWeightStr(raw);
+    const n = parseFloat(raw);
+    if (!isNaN(n) && n >= 0) onChange({ ...value, weight: n });
+    else onChange({ ...value, weight: 0 });
+  };
+
+  const handleClear = () => {
+    setWeightStr('');
+    onClear();
+  };
+
+  const filled = value.reps > 0 && value.weight > 0;
 
   return (
-    <div className="flex items-center gap-2 py-2 border-b border-surface-700/50 last:border-0">
-      <span className="text-xs text-gray-600 w-8 shrink-0">#{setNum}</span>
-
-      {/* Prescribed */}
-      <div className="text-xs text-gray-600 w-28 shrink-0">
-        {prescribed.sets > 1 ? `${prescribed.reps.min}–${prescribed.reps.max}` : `${prescribed.reps.min}–${prescribed.reps.max}`} @ {prescribed.weight}kg
+    <div className="border border-surface-600 rounded bg-surface-700 p-3 mb-2">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-3">
+        <span className="text-xs font-black uppercase tracking-widest text-amber-400">
+          Set {setNum}
+        </span>
+        <span className="text-xs text-gray-600 flex-1 text-center">
+          {prescribed.reps.min === prescribed.reps.max
+            ? prescribed.reps.min
+            : `${prescribed.reps.min}–${prescribed.reps.max}`} reps · {prescribed.weight}kg · RIR {prescribed.rir}
+        </span>
+        <button
+          onClick={handleClear}
+          className="text-gray-600 hover:text-red-400 transition-colors text-xl leading-none px-1 cursor-pointer"
+          title="Clear set"
+        >
+          ×
+        </button>
       </div>
 
-      {/* Actual reps */}
-      <input
-        type="number"
-        min={1}
-        max={50}
-        value={value.reps || ''}
-        onChange={(e) => update('reps', parseInt(e.target.value) || 0)}
-        className="w-16 bg-surface-700 border border-surface-600 text-gray-100 rounded px-2 py-1 text-sm text-center focus:outline-none focus:ring-1 focus:ring-blue-500"
-        placeholder="Reps"
-      />
-      <span className="text-gray-600 text-xs">×</span>
+      {/* Inputs */}
+      <div className="flex items-end gap-3 mb-3">
+        <div className="flex-1">
+          <label className="block text-xs font-bold uppercase tracking-widest text-gray-500 mb-1.5">
+            Reps
+          </label>
+          <select
+            value={value.reps || ''}
+            onChange={(e) => updateReps(parseInt(e.target.value) || 0)}
+            className="w-full bg-surface-800 border border-surface-500 text-gray-100 rounded px-3 py-2.5 text-base focus:outline-none focus:border-amber-500 cursor-pointer"
+          >
+            <option value="">—</option>
+            {REP_OPTIONS.map((r) => (
+              <option key={r} value={r}>{r}</option>
+            ))}
+          </select>
+        </div>
 
-      {/* Actual weight */}
-      <input
-        type="number"
-        min={0}
-        step={2.5}
-        value={value.weight || ''}
-        onChange={(e) => update('weight', parseFloat(e.target.value) || 0)}
-        className="w-20 bg-surface-700 border border-surface-600 text-gray-100 rounded px-2 py-1 text-sm text-center focus:outline-none focus:ring-1 focus:ring-blue-500"
-        placeholder="kg"
-      />
-      <span className="text-gray-600 text-xs">kg</span>
+        <span className="text-gray-600 pb-2.5 font-black text-lg">×</span>
 
-      {/* RIR stepper */}
-      <div className="flex items-center gap-1 ml-auto">
-        <span className="text-xs text-gray-500">RIR</span>
+        <div className="flex-1">
+          <label className="block text-xs font-bold uppercase tracking-widest text-gray-500 mb-1.5">
+            Weight kg
+          </label>
+          <input
+            type="text"
+            inputMode="decimal"
+            value={weightStr}
+            onChange={(e) => handleWeightChange(e.target.value)}
+            placeholder={String(prescribed.weight)}
+            className="w-full bg-surface-800 border border-surface-500 text-gray-100 rounded px-3 py-2.5 text-base focus:outline-none focus:border-amber-500 placeholder:text-gray-700"
+          />
+        </div>
+      </div>
+
+      {/* RIR */}
+      <div className="flex items-center gap-1.5 flex-wrap">
+        <span className="text-xs font-bold uppercase tracking-widest text-gray-600 mr-1">RIR</span>
         {[0, 1, 2, 3, 4, 5].map((r) => (
           <button
             key={r}
-            onClick={() => update('rir', r)}
-            className={`w-6 h-6 rounded text-xs font-medium transition-colors cursor-pointer ${
+            onClick={() => updateRir(r)}
+            className={`w-9 h-9 rounded text-sm font-black transition-colors cursor-pointer ${
               value.rir === r
-                ? 'bg-blue-600 text-white'
-                : 'bg-surface-700 text-gray-500 hover:bg-surface-600'
+                ? 'bg-amber-500 text-black'
+                : 'bg-surface-800 text-gray-500 hover:bg-surface-600 border border-surface-500'
             }`}
           >
             {r}
           </button>
         ))}
-        {value.reps > 0 && value.weight > 0 && (
-          <RIRIndicator prescribed={prescribed.rir} actual={value.rir} />
+        {filled && (
+          <span className="ml-auto">
+            <RIRIndicator prescribed={prescribed.rir} actual={value.rir} />
+          </span>
         )}
       </div>
     </div>
@@ -128,9 +174,9 @@ function ExerciseLogger({ plan, weekNum, value, onChange }: ExerciseLoggerProps)
   const updateSet = (idx: number, updated: LoggedSet) => {
     const newSets = [...sets];
     newSets[idx] = updated;
-    const filledSets = newSets.filter((s) => s.reps > 0 && s.weight > 0);
-    const avgRir = filledSets.length > 0
-      ? filledSets.reduce((a, s) => a + s.rir, 0) / filledSets.length
+    const filled = newSets.filter((s) => s.reps > 0 && s.weight > 0);
+    const avgRir = filled.length > 0
+      ? filled.reduce((a, s) => a + s.rir, 0) / filled.length
       : prescribed.rir;
     const dev = avgRir - prescribed.rir;
     onChange({
@@ -140,23 +186,25 @@ function ExerciseLogger({ plan, weekNum, value, onChange }: ExerciseLoggerProps)
     });
   };
 
+  const clearSet = (idx: number) => {
+    updateSet(idx, {
+      setNumber: idx + 1,
+      reps: 0,
+      weight: 0,
+      rir: prescribed.rir,
+      prescribedRir: prescribed.rir,
+    });
+  };
+
   return (
-    <div className="bg-surface-800 border border-surface-700 rounded-xl overflow-hidden">
-      <div className="px-4 py-2.5 border-b border-surface-700 flex items-center justify-between">
-        <span className="font-medium text-gray-200 text-sm">{plan.exerciseName}</span>
-        <div className="text-xs text-gray-500">
-          Prescribed: {prescribed.sets}×{prescribed.reps.min}–{prescribed.reps.max} @ {prescribed.weight}kg — RIR {prescribed.rir}
+    <div className="bg-surface-800 border border-surface-600 rounded overflow-hidden">
+      <div className="px-4 py-3 border-b border-surface-600 bg-surface-700">
+        <div className="font-black text-gray-100 text-sm uppercase tracking-wide">{plan.exerciseName}</div>
+        <div className="text-xs text-gray-600 mt-0.5 uppercase tracking-widest">
+          {plan.category.replace(/_/g, ' ')} · {prescribed.sets} sets prescribed
         </div>
       </div>
-
-      <div className="px-4">
-        <div className="flex items-center gap-2 py-1.5 text-xs text-gray-600 font-medium border-b border-surface-700/50">
-          <span className="w-8">#</span>
-          <span className="w-28">Prescribed</span>
-          <span className="w-16 text-center">Reps</span>
-          <span className="ml-4 w-20 text-center">Weight</span>
-          <span className="ml-auto">RIR</span>
-        </div>
+      <div className="p-3">
         {sets.map((set, i) => (
           <SetRow
             key={i}
@@ -164,6 +212,7 @@ function ExerciseLogger({ plan, weekNum, value, onChange }: ExerciseLoggerProps)
             prescribed={i < prescribed.sets ? prescribed : weekPlan.backOffSetSpec ?? prescribed}
             value={{ ...set, setNumber: i + 1 }}
             onChange={(v) => updateSet(i, v)}
+            onClear={() => clearSet(i)}
           />
         ))}
       </div>
@@ -171,21 +220,21 @@ function ExerciseLogger({ plan, weekNum, value, onChange }: ExerciseLoggerProps)
   );
 }
 
-// ─── Adjustment Suggestion Card ───────────────────────────────────────────────
+// ─── Suggestion Card ──────────────────────────────────────────────────────────
 
 function SuggestionCard({ suggestion }: { suggestion: AdjustmentSuggestion }) {
   const isUp = suggestion.type === 'increase_weight' || suggestion.type === 'increase_sets';
   return (
-    <div className={`flex items-start gap-3 p-3 rounded-lg border ${
-      isUp ? 'bg-green-900/20 border-green-700/30' : 'bg-red-900/20 border-red-700/30'
+    <div className={`flex items-start gap-3 p-3 rounded border ${
+      isUp ? 'bg-green-900/20 border-green-700/40' : 'bg-red-900/20 border-red-800/40'
     }`}>
-      <span className={`text-xl ${isUp ? 'text-green-400' : 'text-red-400'}`}>
+      <span className={`text-2xl font-black ${isUp ? 'text-green-400' : 'text-red-400'}`}>
         {isUp ? '↑' : '↓'}
       </span>
       <div>
-        <div className="text-sm font-medium text-gray-200">{suggestion.exerciseName}</div>
+        <div className="text-sm font-black text-gray-100 uppercase tracking-wide">{suggestion.exerciseName}</div>
         <div className="text-xs text-gray-400 mt-0.5">{suggestion.reason}</div>
-        <div className={`text-xs font-semibold mt-1 ${isUp ? 'text-green-400' : 'text-red-400'}`}>
+        <div className={`text-xs font-black mt-1 uppercase tracking-widest ${isUp ? 'text-green-400' : 'text-red-400'}`}>
           {isUp ? '+' : '-'}{suggestion.magnitude}kg next session
         </div>
       </div>
@@ -213,7 +262,7 @@ export function WorkoutLogger() {
   const mesoOptions = mesocycles.map((m) => ({ value: m.id, label: m.name }));
   const weekOptions = Array.from({ length: 5 }, (_, i) => ({
     value: String(i + 1),
-    label: i === 4 ? 'Week 5 (Deload)' : `Week ${i + 1}`,
+    label: i === 4 ? 'Week 5 — Deload' : `Week ${i + 1}`,
   }));
   const dayOptions = meso?.days.map((d, i) => ({ value: String(i), label: d.trainingDayName })) ?? [];
 
@@ -234,11 +283,8 @@ export function WorkoutLogger() {
       exercises: day.exercises.map((e) => getOrCreateLog(e.exerciseId, e.exerciseName)),
     };
     addLog(log);
-
-    // Compute suggestions
     const fullLog: WorkoutLog = { ...log, id: 'temp', loggedAt: new Date().toISOString() };
-    const sugg = getSuggestions(fullLog, meso);
-    setSuggestions(sugg);
+    setSuggestions(getSuggestions(fullLog, meso));
     setSaved(true);
     setExerciseLogs({});
   };
@@ -249,7 +295,7 @@ export function WorkoutLogger() {
         <svg className="w-12 h-12 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
         </svg>
-        <h3 className="text-lg font-semibold text-gray-300">No Plan Generated Yet</h3>
+        <h3 className="text-lg font-black text-gray-300 uppercase tracking-wide">No Plan Yet</h3>
         <p className="text-gray-500 text-sm max-w-xs">Generate a training plan first, then log your workouts here.</p>
       </div>
     );
@@ -257,10 +303,10 @@ export function WorkoutLogger() {
 
   return (
     <div className="flex flex-col gap-4 p-4 max-w-3xl mx-auto w-full">
-      <h2 className="text-lg font-bold text-gray-100">Log Workout</h2>
+      <h2 className="text-xs font-black text-gray-500 uppercase tracking-widest">Log Workout</h2>
 
       {/* Selectors */}
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
         <Select label="Mesocycle" options={mesoOptions} value={selectedMesoId}
           onChange={(e) => { setSelectedMesoId(e.target.value); setSaved(false); }} />
         <Select label="Week" options={weekOptions} value={selectedWeek}
@@ -269,26 +315,25 @@ export function WorkoutLogger() {
           onChange={(e) => { setSelectedDayIdx(e.target.value); setSaved(false); }} />
       </div>
 
-      {/* Suggestions from last session */}
+      {/* Post-save feedback */}
       {saved && suggestions.length > 0 && (
         <div className="flex flex-col gap-2">
-          <h3 className="text-sm font-semibold text-gray-300">Adjustment Suggestions</h3>
+          <h3 className="text-xs font-black uppercase tracking-widest text-gray-400">Adjustments for Next Session</h3>
           {suggestions.map((s) => (
             <SuggestionCard key={s.exerciseId} suggestion={s} />
           ))}
         </div>
       )}
-
       {saved && suggestions.length === 0 && (
-        <div className="bg-green-900/20 border border-green-700/30 rounded-lg p-3 text-sm text-green-300">
-          Session logged! RIR was on target — no adjustments needed.
+        <div className="bg-green-900/20 border border-green-700/40 rounded p-3 text-sm font-bold text-green-300 uppercase tracking-wide">
+          Session saved — RIR on target. No adjustments needed.
         </div>
       )}
 
       {/* Exercise loggers */}
       {day?.exercises.map((exPlan) => (
         <ExerciseLogger
-          key={exPlan.exerciseId}
+          key={`${exPlan.exerciseId}-${selectedWeek}-${selectedDayIdx}`}
           plan={exPlan}
           weekNum={weekNum}
           value={getOrCreateLog(exPlan.exerciseId, exPlan.exerciseName)}
@@ -298,9 +343,8 @@ export function WorkoutLogger() {
         />
       ))}
 
-      {/* Save button */}
       {day && (
-        <Button variant="primary" size="lg" onClick={handleSave} className="mt-2">
+        <Button variant="primary" size="lg" onClick={handleSave} className="mt-2 w-full">
           Save Session
         </Button>
       )}

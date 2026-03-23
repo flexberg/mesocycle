@@ -1,4 +1,4 @@
-import React from 'react';
+import type React from 'react';
 
 type Variant = 'primary' | 'secondary' | 'ghost' | 'danger';
 type Size = 'sm' | 'md' | 'lg';
@@ -10,16 +10,16 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const variantClasses: Record<Variant, string> = {
-  primary: 'bg-blue-600 hover:bg-blue-500 text-white border-transparent',
+  primary: 'bg-amber-500 hover:bg-amber-400 text-black font-bold border-transparent',
   secondary: 'bg-surface-700 hover:bg-surface-600 text-gray-100 border-surface-600',
-  ghost: 'bg-transparent hover:bg-surface-700 text-gray-300 hover:text-gray-100 border-transparent',
-  danger: 'bg-red-700 hover:bg-red-600 text-white border-transparent',
+  ghost: 'bg-transparent hover:bg-surface-700 text-gray-400 hover:text-gray-100 border-transparent',
+  danger: 'bg-red-900 hover:bg-red-800 text-red-200 border-transparent',
 };
 
 const sizeClasses: Record<Size, string> = {
-  sm: 'px-2.5 py-1 text-xs rounded',
-  md: 'px-4 py-1.5 text-sm rounded-md',
-  lg: 'px-5 py-2 text-base rounded-lg',
+  sm: 'px-2.5 py-1 text-xs rounded-sm',
+  md: 'px-4 py-1.5 text-sm rounded',
+  lg: 'px-6 py-2.5 text-sm tracking-widest uppercase rounded',
 };
 
 export function Button({

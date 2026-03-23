@@ -29,14 +29,14 @@ export function MesocycleView() {
     <div className="flex flex-col gap-4 p-4 max-w-4xl mx-auto w-full">
       {/* Meso selector */}
       <div className="flex items-center gap-2 flex-wrap">
-        <span className="text-sm text-gray-500">Mesocycle:</span>
+        <span className="text-xs font-bold uppercase tracking-widest text-gray-600">Mesocycle:</span>
         {mesocycles.map((m) => (
           <button
             key={m.id}
             onClick={() => setActive(m.id)}
-            className={`px-3 py-1 rounded-md text-sm font-medium border transition-colors cursor-pointer ${
+            className={`px-3 py-1 rounded-sm text-xs font-bold uppercase tracking-widest border transition-colors cursor-pointer ${
               m.id === meso.id
-                ? 'bg-blue-600/20 text-blue-400 border-blue-600/40'
+                ? 'bg-amber-500/15 text-amber-400 border-amber-500/40'
                 : 'text-gray-500 border-surface-600 hover:border-surface-500 hover:text-gray-300'
             }`}
           >
@@ -49,7 +49,7 @@ export function MesocycleView() {
       <div className="flex items-center gap-4 flex-wrap text-xs">
         {[
           { color: 'bg-green-500', label: 'Easy (W1–2)' },
-          { color: 'bg-amber-500', label: 'Moderate (W3)' },
+          { color: 'bg-orange-500', label: 'Moderate (W3)' },
           { color: 'bg-red-500', label: 'Hard (W4)' },
           { color: 'bg-blue-500', label: 'Deload (W5)' },
         ].map(({ color, label }) => (

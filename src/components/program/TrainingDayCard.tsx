@@ -97,7 +97,7 @@ export function TrainingDayCard({ day, programId, onRemoveDay }: TrainingDayCard
                 onClick={(e) => { e.stopPropagation(); updateDayFrequency(programId, day.id, f); }}
                 className={`px-2 py-0.5 rounded text-xs font-semibold transition-colors cursor-pointer ${
                   (day.frequency ?? 1) === f
-                    ? 'bg-blue-600 text-white'
+                    ? 'bg-amber-500 text-black font-bold'
                     : 'text-gray-500 hover:text-gray-300'
                 }`}
                 title={f === 1 ? '1× per week' : '2× per week — sets split across 2 sessions'}
