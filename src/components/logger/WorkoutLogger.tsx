@@ -34,26 +34,12 @@ interface SetRowProps {
 }
 
 function SetRow({ setNum, prescribed, value, onChange, onClear }: SetRowProps) {
-  const [repsStr, setRepsStr] = useState(value.reps > 0 ? String(value.reps) : '');
-  const [weightStr, setWeightStr] = useState(value.weight > 0 ? String(value.weight) : '');
+  const [clearCount, setClearCount] = useState(0);
 
   const updateRir = (rir: number) => onChange({ ...value, rir });
 
-  const handleRepsChange = (raw: string) => {
-    setRepsStr(raw);
-    const n = parseInt(raw);
-    onChange({ ...value, reps: !isNaN(n) && n > 0 ? n : 0 });
-  };
-
-  const handleWeightChange = (raw: string) => {
-    setWeightStr(raw);
-    const n = parseFloat(raw);
-    onChange({ ...value, weight: !isNaN(n) && n >= 0 ? n : 0 });
-  };
-
   const handleClear = () => {
-    setRepsStr('');
-    setWeightStr('');
+    setClearCount((c) => c + 1);
     onClear();
   };
 
@@ -87,10 +73,14 @@ function SetRow({ setNum, prescribed, value, onChange, onClear }: SetRowProps) {
             Reps
           </label>
           <input
+            key={`r-${setNum}-${clearCount}`}
             type="text"
             inputMode="numeric"
-            value={repsStr}
-            onChange={(e) => handleRepsChange(e.target.value)}
+            defaultValue={value.reps > 0 ? String(value.reps) : ''}
+            onChange={(e) => {
+              const n = parseInt(e.target.value);
+              onChange({ ...value, reps: !isNaN(n) && n > 0 ? n : 0 });
+            }}
             placeholder={String(prescribed.reps.max)}
             className="w-full bg-surface-800 border border-surface-500 text-gray-100 rounded px-3 py-2.5 text-base focus:outline-none focus:border-amber-500 placeholder:text-gray-700"
           />
@@ -103,10 +93,14 @@ function SetRow({ setNum, prescribed, value, onChange, onClear }: SetRowProps) {
             Weight kg
           </label>
           <input
+            key={`w-${setNum}-${clearCount}`}
             type="text"
             inputMode="decimal"
-            value={weightStr}
-            onChange={(e) => handleWeightChange(e.target.value)}
+            defaultValue={value.weight > 0 ? String(value.weight) : ''}
+            onChange={(e) => {
+              const n = parseFloat(e.target.value);
+              onChange({ ...value, weight: !isNaN(n) && n >= 0 ? n : 0 });
+            }}
             placeholder={String(prescribed.weight)}
             className="w-full bg-surface-800 border border-surface-500 text-gray-100 rounded px-3 py-2.5 text-base focus:outline-none focus:border-amber-500 placeholder:text-gray-700"
           />
