@@ -33,24 +33,26 @@ interface SetRowProps {
   onClear: () => void;
 }
 
-const REP_OPTIONS = Array.from({ length: 30 }, (_, i) => i + 1);
-
 function SetRow({ setNum, prescribed, value, onChange, onClear }: SetRowProps) {
-  const [weightStr, setWeightStr] = useState(
-    value.weight > 0 ? String(value.weight) : ''
-  );
+  const [repsStr, setRepsStr] = useState(value.reps > 0 ? String(value.reps) : '');
+  const [weightStr, setWeightStr] = useState(value.weight > 0 ? String(value.weight) : '');
 
-  const updateReps = (reps: number) => onChange({ ...value, reps });
   const updateRir = (rir: number) => onChange({ ...value, rir });
+
+  const handleRepsChange = (raw: string) => {
+    setRepsStr(raw);
+    const n = parseInt(raw);
+    onChange({ ...value, reps: !isNaN(n) && n > 0 ? n : 0 });
+  };
 
   const handleWeightChange = (raw: string) => {
     setWeightStr(raw);
     const n = parseFloat(raw);
-    if (!isNaN(n) && n >= 0) onChange({ ...value, weight: n });
-    else onChange({ ...value, weight: 0 });
+    onChange({ ...value, weight: !isNaN(n) && n >= 0 ? n : 0 });
   };
 
   const handleClear = () => {
+    setRepsStr('');
     setWeightStr('');
     onClear();
   };
@@ -84,16 +86,14 @@ function SetRow({ setNum, prescribed, value, onChange, onClear }: SetRowProps) {
           <label className="block text-xs font-bold uppercase tracking-widest text-gray-500 mb-1.5">
             Reps
           </label>
-          <select
-            value={value.reps || ''}
-            onChange={(e) => updateReps(parseInt(e.target.value) || 0)}
-            className="w-full bg-surface-800 border border-surface-500 text-gray-100 rounded px-3 py-2.5 text-base focus:outline-none focus:border-amber-500 cursor-pointer"
-          >
-            <option value="">—</option>
-            {REP_OPTIONS.map((r) => (
-              <option key={r} value={r}>{r}</option>
-            ))}
-          </select>
+          <input
+            type="text"
+            inputMode="numeric"
+            value={repsStr}
+            onChange={(e) => handleRepsChange(e.target.value)}
+            placeholder={String(prescribed.reps.max)}
+            className="w-full bg-surface-800 border border-surface-500 text-gray-100 rounded px-3 py-2.5 text-base focus:outline-none focus:border-amber-500 placeholder:text-gray-700"
+          />
         </div>
 
         <span className="text-gray-600 pb-2.5 font-black text-lg">×</span>
